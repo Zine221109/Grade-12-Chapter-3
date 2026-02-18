@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3: Hardware – Grade 12 IT</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --dark:      #0a0e1a;
+  --midnight:  #121829;
+  --navy:      #1a2642;
+  --slate:     #2d3e5f;
+  --electric:  #00ffcc;
+  --cyan:      #00d9ff;
+  --volt:      #ffee00;
+  --orange:    #ff6b35;
+  --crimson:   #ff3366;
+  --purple:    #9b59ff;
+  --ice:       #e0f7ff;
+  --muted:     #8a9bb5;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--dark);color:var(--ice);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;position:relative;overflow-x:hidden;
+}
+
+/* CIRCUIT BOARD BG */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    linear-gradient(90deg,rgba(0,255,204,.02) 1px,transparent 1px),
+    linear-gradient(rgba(0,255,204,.02) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;
+}
+body::after{
+  content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;z-index:0;
+  background:radial-gradient(circle,rgba(0,217,255,.08) 1px,transparent 1px);
+  background-size:24px 24px;
+  animation:bgdrift 60s linear infinite;pointer-events:none;
+}
+@keyframes bgdrift{to{transform:translate(24px,24px);}}
+
+/* HERO */
+.hero{
+  position:relative;z-index:2;
+  padding:72px 20px 60px;text-align:center;
+  background:linear-gradient(180deg,rgba(0,255,204,.05),transparent);
+  border-bottom:1px solid rgba(0,255,204,.15);
+}
+.badge{
+  display:inline-block;
+  background:rgba(255,238,0,.1);border:1px solid rgba(255,238,0,.4);
+  color:var(--volt);font-family:'Space Mono',monospace;
+  font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:6px 18px;border-radius:4px;margin-bottom:20px;
+}
+.hero h1{
+  font-family:'Orbitron',sans-serif;font-weight:900;
+  font-size:clamp(2.5rem,7vw,4.5rem);line-height:1.1;
+  margin-bottom:16px;
+  background:linear-gradient(135deg,var(--electric),var(--cyan),var(--volt));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-shadow:0 0 40px rgba(0,255,204,.4);
+}
+.hero-sub{color:var(--muted);font-size:1.05rem;max-width:620px;margin:0 auto 32px;line-height:1.7;}
+
+.tech-pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:700px;margin:0 auto;}
+.tech-pill{
+  background:rgba(255,255,255,.03);border:1px solid var(--slate);
+  border-radius:24px;padding:7px 18px;font-size:.82rem;
+  color:var(--cyan);font-family:'Space Mono',monospace;
+}
+
+/* NAV */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,14,26,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(0,255,204,.2);
+  display:flex;overflow-x:auto;scrollbar-width:none;padding:0 16px;
+}
+.nav::-webkit-scrollbar{display:none;}
+.ntab{
+  flex-shrink:0;background:none;border:none;cursor:pointer;
+  color:var(--muted);font-family:'Orbitron',sans-serif;font-weight:700;
+  font-size:.82rem;padding:16px 20px;
+  border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;
+}
+.ntab:hover{color:var(--ice);}
+.ntab.on{color:var(--electric);border-bottom-color:var(--electric);}
+
+/* PROGRESS */
+.prog-wrap{max-width:960px;margin:16px auto;padding:0 20px;position:relative;z-index:2;}
+.prog-track{background:rgba(255,255,255,.05);border-radius:20px;height:6px;overflow:hidden;border:1px solid var(--slate);}
+.prog-fill{
+  height:100%;border-radius:20px;
+  background:linear-gradient(90deg,var(--purple),var(--cyan),var(--electric));
+  transition:width .4s ease;box-shadow:0 0 12px rgba(0,255,204,.5);
+}
+
+/* SECTIONS */
+.sec{display:none;animation:fadein .4s ease;}
+.sec.on{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.wrap{max-width:960px;margin:0 auto;padding:40px 20px 100px;position:relative;z-index:2;}
+
+/* HEADINGS */
+.sh{
+  font-family:'Orbitron',sans-serif;font-weight:900;font-size:2rem;
+  margin-bottom:8px;
+  background:linear-gradient(135deg,var(--electric),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.ss{color:var(--muted);font-size:.95rem;margin-bottom:32px;line-height:1.7;}
+
+/* CARDS */
+.card{
+  background:linear-gradient(135deg,rgba(26,38,66,.4),rgba(18,24,41,.4));
+  border:1px solid var(--slate);border-radius:12px;
+  padding:28px 32px;margin-bottom:20px;
+  position:relative;overflow:hidden;backdrop-filter:blur(8px);
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--electric),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.card:hover::before{opacity:1;}
+
+.ct{
+  font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:700;
+  margin-bottom:14px;display:flex;align-items:center;gap:10px;color:var(--electric);
+}
+.ci{font-size:1.4rem;}
+.card p,.card li{color:var(--muted);line-height:1.75;font-size:.92rem;}
+.card ul{padding-left:22px;margin-top:10px;}
+.card ul li{margin-bottom:8px;}
+
+/* COLOR ACCENTS */
+.card.electric{border-left:3px solid var(--electric);}
+.card.cyan{border-left:3px solid var(--cyan);}
+.card.volt{border-left:3px solid var(--volt);}
+.card.orange{border-left:3px solid var(--orange);}
+.card.crimson{border-left:3px solid var(--crimson);}
+.card.purple{border-left:3px solid var(--purple);}
+
+/* GRID 2 */
+.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-bottom:24px;}
+
+/* MOBILE/DESKTOP COMPARISON */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:24px;}
+.comp-card{
+  background:rgba(26,38,66,.3);border:1px solid var(--slate);
+  border-radius:10px;padding:20px;cursor:pointer;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.comp-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:var(--electric);transform:scaleX(0);transition:transform .3s;
+}
+.comp-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,255,204,.15);}
+.comp-card:hover::after{transform:scaleX(1);}
+.comp-icon{font-size:2.2rem;margin-bottom:10px;display:block;}
+.comp-title{font-family:'Orbitron',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:8px;color:var(--cyan);}
+.comp-desc{font-size:.84rem;color:var(--muted);line-height:1.6;}
+
+/* PERFORMANCE FACTORS */
+.pf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:24px;}
+.pf-card{
+  background:rgba(18,24,41,.6);border:1px solid var(--slate);
+  border-radius:10px;padding:18px;text-align:center;
+  transition:all .3s;cursor:pointer;position:relative;
+}
+.pf-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,255,204,.05),rgba(0,217,255,.05));
+  opacity:0;transition:opacity .3s;border-radius:10px;
+}
+.pf-card:hover::before{opacity:1;}
+.pf-card:hover{transform:scale(1.05);border-color:var(--electric);}
+.pf-icon{font-size:2.5rem;margin-bottom:10px;display:block;filter:drop-shadow(0 0 8px currentColor);}
+.pf-name{font-family:'Orbitron',sans-serif;font-weight:700;font-size:.92rem;margin-bottom:8px;color:var(--volt);}
+.pf-exp{
+  font-size:.8rem;color:var(--muted);line-height:1.5;
+  max-height:0;overflow:hidden;transition:max-height .4s;margin-top:0;
+}
+.pf-card.open .pf-exp{max-height:400px;margin-top:10px;}
+
+/* USER PROFILES */
+.user-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+.user-card{
+  background:linear-gradient(135deg,rgba(26,38,66,.5),rgba(45,62,95,.3));
+  border:1px solid var(--slate);border-radius:12px;padding:22px;
+  text-align:center;transition:all .3s;cursor:pointer;
+}
+.user-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,255,204,.2);border-color:var(--electric);}
+.user-icon{font-size:2.8rem;margin-bottom:12px;display:block;}
+.user-name{font-family:'Orbitron',sans-serif;font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--cyan);}
+.user-needs{font-size:.8rem;color:var(--muted);line-height:1.5;}
+
+/* CALLOUT */
+.callout{
+  border-radius:10px;padding:16px 20px;margin:20px 0;
+  display:flex;gap:14px;align-items:flex-start;font-size:.88rem;line-height:1.7;
+}
+.callout.electric{background:rgba(0,255,204,.08);border-left:3px solid var(--electric);color:#b0f7e8;}
+.callout.cyan{background:rgba(0,217,255,.08);border-left:3px solid var(--cyan);color:#b0edff;}
+.callout.volt{background:rgba(255,238,0,.08);border-left:3px solid var(--volt);color:#fff8b0;}
+.callout.orange{background:rgba(255,107,53,.08);border-left:3px solid var(--orange);color:#ffcdb0;}
+.callout.crimson{background:rgba(255,51,102,.08);border-left:3px solid var(--crimson);color:#ffb3cc;}
+.callout-icon{font-size:1.3rem;flex-shrink:0;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem;margin:20px 0;border-radius:10px;overflow:hidden;}
+.tbl th{background:var(--navy);color:var(--electric);padding:12px 16px;text-align:left;font-weight:700;font-size:.8rem;font-family:'Orbitron',sans-serif;}
+.tbl td{background:rgba(18,24,41,.5);color:var(--ice);padding:11px 16px;border-bottom:1px solid var(--slate);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(26,38,66,.6);}
+
+/* QUIZ */
+.qbox{
+  background:rgba(26,38,66,.4);border:1px solid var(--slate);
+  border-radius:12px;padding:26px;margin-bottom:18px;
+}
+.qtext{font-weight:700;font-size:1rem;margin-bottom:18px;line-height:1.6;color:var(--electric);}
+.qopts{display:flex;flex-direction:column;gap:10px;}
+.qopt{
+  background:rgba(18,24,41,.6);border:1px solid var(--slate);
+  border-radius:8px;padding:13px 18px;cursor:pointer;
+  font-size:.88rem;text-align:left;color:var(--ice);
+  font-family:'Inter',sans-serif;transition:all .2s;
+}
+.qopt:hover{border-color:var(--cyan);background:rgba(0,217,255,.08);}
+.qopt.right{border-color:var(--electric);background:rgba(0,255,204,.12);color:var(--electric);}
+.qopt.wrong{border-color:var(--crimson);background:rgba(255,51,102,.12);color:var(--crimson);}
+.qopt:disabled{pointer-events:none;opacity:.7;}
+.qfb{margin-top:14px;padding:14px 18px;border-radius:8px;font-size:.88rem;line-height:1.65;display:none;}
+.qfb.show{display:block;}
+.qfb.right{background:rgba(0,255,204,.1);border:1px solid var(--electric);color:var(--electric);}
+.qfb.wrong{background:rgba(255,51,102,.1);border:1px solid var(--crimson);color:var(--crimson);}
+
+.score-banner{
+  background:linear-gradient(135deg,rgba(26,38,66,.6),rgba(45,62,95,.4));
+  border:1px solid var(--electric);border-radius:14px;
+  padding:32px;text-align:center;margin-bottom:32px;display:none;
+}
+.score-banner.show{display:block;}
+.score-big{
+  font-family:'Orbitron',sans-serif;font-size:4rem;font-weight:900;
+  background:linear-gradient(135deg,var(--electric),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* SUMMARY */
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:28px;}
+.sum-item{background:rgba(26,38,66,.4);border:1px solid var(--slate);border-radius:10px;padding:18px;}
+.sum-label{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--orange);letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;}
+.sum-title{font-weight:700;font-size:.95rem;margin-bottom:6px;color:var(--cyan);}
+.sum-item p{font-size:.82rem;color:var(--muted);line-height:1.6;}
+
+/* BTN */
+.btn{
+  display:inline-block;cursor:pointer;padding:12px 28px;border-radius:6px;
+  font-family:'Orbitron',sans-serif;font-size:.88rem;font-weight:700;
+  border:none;transition:all .3s;text-decoration:none;position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+  transform:translateX(-100%);transition:transform .5s;
+}
+.btn:hover::before{transform:translateX(100%);}
+.btn-electric{background:var(--electric);color:var(--dark);}
+.btn-electric:hover{box-shadow:0 8px 24px rgba(0,255,204,.4);transform:translateY(-2px);}
+.btn-out{background:none;border:2px solid var(--slate);color:var(--ice);}
+.btn-out:hover{border-color:var(--cyan);color:var(--cyan);}
+
+hr.div{border:none;border-top:1px solid rgba(255,255,255,.1);margin:32px 0;}
+
+code{
+  font-family:'Space Mono',monospace;background:rgba(155,89,255,.15);
+  color:var(--purple);padding:3px 8px;border-radius:4px;font-size:.88em;
+}
+
+/* CASE STUDY */
+.case{
+  background:linear-gradient(135deg,rgba(255,51,102,.08),rgba(255,107,53,.08));
+  border:1px solid rgba(255,51,102,.3);border-radius:12px;
+  padding:24px 28px;margin:24px 0;
+}
+.case-title{
+  font-family:'Orbitron',sans-serif;font-weight:700;font-size:1.1rem;
+  margin-bottom:12px;color:var(--crimson);
+}
+.case p{color:var(--muted);line-height:1.75;font-size:.9rem;}
+
+@media(max-width:640px){
+  .wrap{padding:28px 16px 70px;}
+  .card{padding:20px 18px;}
+  .hero{padding:56px 16px 44px;}
+}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:var(--dark);}
+::-webkit-scrollbar-thumb{background:var(--slate);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--electric);}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">Grade 12 IT · Term 2 · Chapter 3</div>
+  <h1>HARDWARE</h1>
+  <p class="hero-sub">From pocket-sized smartphones to desktop powerhouses — understand the components that make computers tick, the performance factors that matter, and how to spec the perfect system for any user.</p>
+  <div class="tech-pills">
+    <div class="tech-pill">📱 Mobile Technologies</div>
+    <div class="tech-pill">⚡ Performance Factors</div>
+    <div class="tech-pill">👤 User Requirements</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <button class="ntab on" onclick="go('intro')">🏠 Intro</button>
+  <button class="ntab" onclick="go('mobile')">📱 Mobile Tech</button>
+  <button class="ntab" onclick="go('performance')">⚡ Performance</button>
+  <button class="ntab" onclick="go('users')">👤 User Specs</button>
+  <button class="ntab" onclick="go('quiz')">🎯 Quiz</button>
+  <button class="ntab" onclick="go('summary')">📋 Summary</button>
+</nav>
+
+<!-- PROGRESS -->
+<div class="prog-wrap">
+  <div class="prog-track"><div class="prog-fill" id="pf" style="width:16%"></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- INTRO                                       -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec on" id="sec-intro">
+  <div class="wrap">
+    <div class="sh">Welcome to Chapter 3 🔌</div>
+    <div class="ss">The shift from desktop to mobile is the biggest tech trend of the 2020s. Let's understand why — and what makes hardware perform.</div>
+
+    <div class="g2">
+      <div class="card electric">
+        <div class="ct"><span class="ci">💻</span>Hardware Recap</div>
+        <p style="margin-bottom:12px;"><strong>Hardware</strong> = the physical components of a computer. Everything you can touch!</p>
+        <ul>
+          <li><strong>Input:</strong> Keyboard, mouse, touch, scanners, cameras</li>
+          <li><strong>Output:</strong> Monitors (LCD, LED), printers, speakers</li>
+          <li><strong>Storage:</strong> HDD, SSD, flash drives, SD cards, DVDs</li>
+          <li><strong>Processing:</strong> CPU (general tasks), GPU (graphics)</li>
+        </ul>
+      </div>
+      <div class="card cyan">
+        <div class="ct"><span class="ci">📊</span>The Mobile Revolution</div>
+        <p>More mobile devices are sold today than desktops. Why? Because smartphones provide <em>most</em> of the advantages of computers wherever you go — no desk required!</p>
+        <p style="margin-top:10px;">Only specialist tasks like programming, video editing and gaming still prefer desktops. For everything else? Mobile wins.</p>
+      </div>
+    </div>
+
+    <div class="callout electric">
+      <span class="callout-icon">🎯</span>
+      <span><strong>Chapter Goals:</strong> Understand mobile vs desktop trade-offs, identify the 6 factors that determine computer performance, and learn to spec the perfect computer for any user type (home, office, gamer, power user).</span>
+    </div>
+
+    <button class="btn btn-electric" onclick="go('mobile')">Start: Unit 3.1 – Mobile Technologies →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- UNIT 3.1: MOBILE TECHNOLOGIES              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="sec-mobile">
+  <div class="wrap">
+    <div class="sh">📱 Unit 3.1: Mobile Technologies</div>
+    <div class="ss">Smartphones, laptops, tablets — powerful computers you can carry anywhere. But what's the trade-off?</div>
+
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.3rem;margin-bottom:18px;color:var(--volt);">📱 vs 🖥️ — The Showdown</div>
+
+    <div class="comp-grid">
+      <div class="comp-card">
+        <span class="comp-icon" style="color:var(--electric);">📱</span>
+        <div class="comp-title">Smartphone / Tablet</div>
+        <div class="comp-desc"><strong>✅ Better at:</strong> Location-based apps (Uber, weather, GPS), reading messages, social media, quick emails, video calls, portability</div>
+      </div>
+      <div class="comp-card">
+        <span class="comp-icon" style="color:var(--cyan);">🖥️</span>
+        <div class="comp-title">Desktop Computer</div>
+        <div class="comp-desc"><strong>✅ Better at:</strong> Serious processing tasks (video editing, programming), gaming, large amounts of data entry, multitasking power apps</div>
+      </div>
+    </div>
+
+    <div class="card volt">
+      <div class="ct"><span class="ci">⭐</span>Advantages of Mobility</div>
+      <p>When compared to desktops, mobile computers have significant advantages:</p>
+      <ul style="margin-top:10px;">
+        <li><strong>Size & Weight:</strong> Small, lightweight — easy to carry, use anywhere, no desk needed</li>
+        <li><strong>Always-On Connectivity:</strong> Built-in Bluetooth, Wi-Fi, 4G/5G — connect from anywhere in the world</li>
+        <li><strong>Location-Based Computing:</strong> GPS + mobile internet enables weather apps, Uber, food delivery, augmented reality (Pokémon GO!)</li>
+      </ul>
+    </div>
+
+    <hr class="div">
+
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.3rem;margin-bottom:18px;color:var(--crimson);">⚠️ Mobile Constraints</div>
+    <div style="color:var(--muted);margin-bottom:20px;font-size:.92rem;">Mobile computing constraints = the <strong>disadvantages</strong> caused by battery life and computing power vs power consumption.</div>
+
+    <div class="g2">
+      <div class="card orange">
+        <div class="ct"><span class="ci">🔋</span>Constraint 1: Battery Life</div>
+        <p>The more power a CPU uses, the more instructions it can complete — but smartphones have <strong>limited battery</strong> that must last all day.</p>
+        <p style="margin-top:10px;">Desktop CPUs can draw 100+ watts. Smartphone CPUs? Just 2-5 watts. This limits performance drastically.</p>
+      </div>
+      <div class="card crimson">
+        <div class="ct"><span class="ci">🔥</span>Constraint 2: Power vs Heat</div>
+        <p style="margin-bottom:10px;">More power = more heat. Desktop CPUs use heat sinks and fans to cool down. Smartphones? No space for cooling fans!</p>
+        <p>If a smartphone CPU ran at desktop speeds, it would <strong>overheat and catch fire</strong>. So mobile chips are intentionally slower to stay cool.</p>
+      </div>
+    </div>
+
+    <div class="callout volt">
+      <span class="callout-icon">💡</span>
+      <span><strong>Fun Fact:</strong> A high-end gaming PC uses more power in ONE day than a high-end smartphone uses in an ENTIRE year!</span>
+    </div>
+
+    <div class="case">
+      <div class="case-title">📵 Case Study: Samsung Galaxy Note 7 (2016)</div>
+      <p style="margin-bottom:10px;">The Galaxy Note 7 was one of 2016's fastest and most expensive smartphones. A few weeks after launch, Samsung received thousands of complaints that phones were heating up to dangerous levels.</p>
+      <p style="margin-bottom:10px;">Result? <strong>2 million phones recalled.</strong> After testing 200,000 phones, Samsung found the problem: lack of space between the CPU and battery. The CPU's heat warped the battery connectors, causing them to short circuit and <em>catch fire</em>.</p>
+      <p>Airlines banned the Note 7. Production stopped completely. All because of heat management failure!</p>
+    </div>
+
+    <hr class="div">
+
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.1rem;margin-bottom:14px;color:var(--cyan);">🔌 Other Mobile Limitations</div>
+    <div class="g2">
+      <div class="card purple">
+        <div class="ct"><span class="ci">📐</span>Screen Size</div>
+        <p>Even the biggest smartphone screen is tiny compared to a desktop monitor. This makes spreadsheets, word processing and multitasking difficult. Smartphones can't display large amounts of information well.</p>
+      </div>
+      <div class="card cyan">
+        <div class="ct"><span class="ci">⌨️</span>Input Method</div>
+        <p>On-screen touch keyboards are great for quick messages but <em>not</em> for entering large amounts of text. Physical keyboard + mouse is still superior for productivity work.</p>
+      </div>
+      <div class="card electric">
+        <div class="ct"><span class="ci">📦</span>Integrated Components</div>
+        <p>A desktop CPU is just a CPU. A smartphone chip contains: CPU, GPU, LTE modem, Wi-Fi, RAM, Bluetooth, GPS — all in one! Each component must be smaller and less powerful.</p>
+      </div>
+    </div>
+
+    <div class="callout crimson">
+      <span class="callout-icon">⚡</span>
+      <span><strong>The Bottom Line:</strong> Smartphones are incredible for mobility and location-based tasks. Desktops are unbeatable for processing power and serious work. Choose the right tool for the job!</span>
+    </div>
+
+    <button class="btn btn-electric" onclick="go('performance')">Next: Unit 3.2 – Performance Factors →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- UNIT 3.2: PERFORMANCE FACTORS              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="sec-performance">
+  <div class="wrap">
+    <div class="sh">⚡ Unit 3.2: Performance Factors</div>
+    <div class="ss">What makes one computer faster than another? Six key components determine performance. Click each to learn more!</div>
+
+    <div class="pf-grid">
+      <div class="pf-card" onclick="togglePF(this)">
+        <span class="pf-icon" style="color:var(--electric);">🧠</span>
+        <div class="pf-name">CPU</div>
+        <div class="pf-exp">The brain of the computer. Two factors matter: <strong>(1) Speed (GHz)</strong> — how many instructions per second, and <strong>(2) Multiprocessing</strong> — handling tasks from multiple apps simultaneously. More cores = better multitasking.</div>
+      </div>
+      <div class="pf-card" onclick="togglePF(this)">
+        <span class="pf-icon" style="color:var(--cyan);">🎮</span>
+        <div class="pf-name">GPU</div>
+        <div class="pf-exp">Graphics Processing Unit. Affects graphic-intensive tasks like gaming and video editing. Two factors: <strong>GPU clock speed (MHz)</strong> and <strong>GPU type</strong>. A slow GPU won't affect browsing or documents, but games will look terrible!</div>
+      </div>
+      <div class="pf-card" onclick="togglePF(this)">
+        <span class="pf-icon" style="color:var(--volt);">💾</span>
+        <div class="pf-name">RAM</div>
+        <div class="pf-exp">When RAM is too small, the computer slows down — constantly swapping data in and out. When switching between apps, if RAM is full, your computer might auto-close apps to free memory. More RAM = smoother multitasking.</div>
+      </div>
+      <div class="pf-card" onclick="togglePF(this)">
+        <span class="pf-icon" style="color:var(--orange);">⚡</span>
+        <div class="pf-name">Cache Memory</div>
+        <div class="pf-exp"><strong>CPU Cache:</strong> High-speed memory built into the CPU for quick data access. <strong>Disk Cache:</strong> Small RAM in the hard drive storing data being sent/received. <strong>Web Cache:</strong> Stores images/pages on your HDD so you can reload previously-viewed pages faster.</div>
+      </div>
+      <div class="pf-card" onclick="togglePF(this)">
+        <span class="pf-icon" style="color:var(--crimson);">💿</span>
+        <div class="pf-name">Storage Speed</div>
+        <div class="pf-exp">How fast your HDD/SSD reads and writes data. Affects: opening programs, loading large files, booting your OS. <strong>HDD:</strong> measured in RPM (5400, 7200). <strong>SSD:</strong> much faster! Disk caching also helps speed up repeated reads/writes.</div>
+      </div>
+      <div class="pf-card" onclick="togglePF(this)">
+        <span class="pf-icon" style="color:var(--purple);">🌐</span>
+        <div class="pf-name">Network Speed</div>
+        <div class="pf-exp">The NIC (Network Interface Card) connects your PC to the internet. Measured in Mbps: 10 Mbps = slow, 100 Mbps = faster, 1000 Mbps (1 Gbps) = fastest. Affects loading webpages, downloading games/updates, streaming video, copying data over network.</div>
+      </div>
+    </div>
+
+    <div class="callout electric">
+      <span class="callout-icon">🔧</span>
+      <span><strong>Pro Tip:</strong> A computer is only as fast as its slowest component! A new CPU won't help if you have 2GB of ancient RAM and a 5400 RPM hard drive from 2010.</span>
+    </div>
+
+    <hr class="div">
+
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.1rem;margin-bottom:16px;color:var(--cyan);">📊 Performance Factor Comparison</div>
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr><th>Component</th><th>Measured In</th><th>What It Affects</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>CPU</strong></td><td>GHz, # of cores</td><td>Overall computer speed, multitasking ability</td></tr>
+          <tr><td><strong>GPU</strong></td><td>MHz, GPU type</td><td>Gaming performance, video editing, 3D rendering</td></tr>
+          <tr><td><strong>RAM</strong></td><td>GB, MHz</td><td>Multitasking, switching between apps</td></tr>
+          <tr><td><strong>Storage</strong></td><td>RPM (HDD), type (SSD)</td><td>Boot time, opening programs, loading files</td></tr>
+          <tr><td><strong>Cache</strong></td><td>MB</td><td>Speed of repeated data access</td></tr>
+          <tr><td><strong>Network</strong></td><td>Mbps</td><td>Internet speed, downloads, streaming</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card purple">
+      <div class="ct"><span class="ci">🚌</span>Bonus: The Bus System</div>
+      <p>The <strong>bus system</strong> connects the CPU with memory, input/output devices and storage. Think of it as the electrical highway carrying data between components. Faster buses = faster communication = better performance!</p>
+    </div>
+
+    <button class="btn btn-electric" onclick="go('users')">Next: Unit 3.3 – User Requirements →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- UNIT 3.3: USER REQUIREMENTS                -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="sec-users">
+  <div class="wrap">
+    <div class="sh">👤 Unit 3.3: Matching Hardware to Users</div>
+    <div class="ss">Not everyone needs a gaming beast. Learn to spec the perfect computer for each user type!</div>
+
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.2rem;margin-bottom:18px;color:var(--electric);">🎭 The Four User Types</div>
+
+    <div class="user-grid">
+      <div class="user-card" onclick="showUser(this,'home')">
+        <span class="user-icon">🏠</span>
+        <div class="user-name">Home User</div>
+        <div class="user-needs">Browsing, social media, email, word processing, videos, music</div>
+      </div>
+      <div class="user-card" onclick="showUser(this,'office')">
+        <span class="user-icon">💼</span>
+        <div class="user-name">Small Office User</div>
+        <div class="user-needs">Research, email, documents, spreadsheets, note-taking, meetings</div>
+      </div>
+      <div class="user-card" onclick="showUser(this,'gamer')">
+        <span class="user-icon">🎮</span>
+        <div class="user-name">Gamer</div>
+        <div class="user-needs">High-end games, fast frame rates, 4K graphics, streaming</div>
+      </div>
+      <div class="user-card" onclick="showUser(this,'power')">
+        <span class="user-icon">⚡</span>
+        <div class="user-name">Power User</div>
+        <div class="user-needs">Video editing, 3D rendering, programming, running multiple VMs</div>
+      </div>
+    </div>
+
+    <div id="userDetail" style="display:none;margin-top:24px;"></div>
+
+    <hr class="div">
+
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.1rem;margin-bottom:16px;color:var(--volt);">🛠️ Hardware Configuration Guide</div>
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr><th>Component</th><th>🏠 Home</th><th>💼 Office</th><th>🎮 Gamer</th><th>⚡ Power User</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>CPU</strong></td><td>Entry (i3, Ryzen 3)</td><td>Mid (Notebook i5)</td><td>High (i5, Ryzen 5)</td><td>High-end (i7, Ryzen 7)</td></tr>
+          <tr><td><strong>GPU</strong></td><td>None / Entry</td><td>None</td><td>High-end (x60, x70)</td><td>High-end (x60, x70)</td></tr>
+          <tr><td><strong>RAM</strong></td><td>8 GB, 2400 MHz</td><td>8 GB</td><td>8 GB, 2666 MHz</td><td>16 GB, 2666 MHz</td></tr>
+          <tr><td><strong>Storage</strong></td><td>1 TB HDD, 7200 RPM</td><td>500 GB</td><td>256 GB SSD + 2 TB HDD</td><td>256 GB SSD + 4 TB HDD</td></tr>
+          <tr><td><strong>Monitor</strong></td><td>23" FHD</td><td>14-15" built-in</td><td>23" FHD</td><td>2× 23" FHD</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout cyan">
+      <span class="callout-icon">💡</span>
+      <span><strong>Remember:</strong> Hardware manufacturers release new components every year. Before purchasing, always do research to find the best current options! This table is a starting point, not a gospel.</span>
+    </div>
+
+    <hr class="div">
+
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.1rem;margin-bottom:16px;color:var(--orange);">🎯 Key Priorities by User Type</div>
+    <div class="g2">
+      <div class="card electric">
+        <div class="ct"><span class="ci">🏠</span>Home User</div>
+        <p><strong>Priority:</strong> Balance of cost and capability</p>
+        <p style="margin-top:8px;"><strong>Can start with:</strong> Desktop with mid-range CPU, entry GPU (for light gaming), 8 GB RAM</p>
+      </div>
+      <div class="card cyan">
+        <div class="ct"><span class="ci">💼</span>Office User</div>
+        <p><strong>Priority:</strong> Mobility, battery life, screen resolution, speed</p>
+        <p style="margin-top:8px;"><strong>Best choice:</strong> Ultrabook or mid-range notebook — portable for meetings, lasts all day</p>
+      </div>
+      <div class="card volt">
+        <div class="ct"><span class="ci">🎮</span>Gamer</div>
+        <p><strong>Priority:</strong> CPU speed, GPU processing power</p>
+        <p style="margin-top:8px;"><strong>Essential:</strong> High-end GPU (most important!), fast CPU, good cooling, high refresh rate monitor</p>
+      </div>
+      <div class="card orange">
+        <div class="ct"><span class="ci">⚡</span>Power User</div>
+        <p><strong>Priority:</strong> Processing power, storage, memory, multi-monitor support</p>
+        <p style="margin-top:8px;"><strong>Needs:</strong> High-end CPU, high-end GPU, 16+ GB RAM, large storage (SSD + HDD combo), 2+ monitors</p>
+      </div>
+    </div>
+
+    <button class="btn btn-electric" onclick="go('quiz')">Ready? Take the Quiz! 🎯</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- QUIZ                                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="sec-quiz">
+  <div class="wrap">
+    <div class="sh">🎯 Knowledge Check — All 3 Units</div>
+    <div class="ss">10 questions covering mobile tech, performance factors and user requirements. Good luck!</div>
+
+    <div class="score-banner" id="scoreBanner">
+      <div class="score-big" id="scoreNum">0/10</div>
+      <p style="color:var(--muted);margin-top:10px;" id="scoreMsg">Complete the quiz to see your score!</p>
+    </div>
+
+    <!-- Q1 -->
+    <div class="qbox" data-c="a">
+      <div class="qtext">1. Which device is BEST suited for location-based technology?</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','a')">A) Smartphone</button>
+        <button class="qopt" onclick="ans(this,'b','a')">B) Desktop PC</button>
+        <button class="qopt" onclick="ans(this,'c','a')">C) Server</button>
+        <button class="qopt" onclick="ans(this,'d','a')">D) Laptop</button>
+      </div>
+      <div class="qfb" id="f1"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="qbox" data-c="b">
+      <div class="qtext">2. The more power a CPU uses, the _____ heat it generates.</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','b')">A) Less</button>
+        <button class="qopt" onclick="ans(this,'b','b')">B) More</button>
+        <button class="qopt" onclick="ans(this,'c','b')">C) Same amount of</button>
+        <button class="qopt" onclick="ans(this,'d','b')">D) Heat is unrelated to power</button>
+      </div>
+      <div class="qfb" id="f2"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="qbox" data-c="c">
+      <div class="qtext">3. Why can't smartphones run the same CPU-intensive programs as desktops?</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','c')">A) Smartphones don't have CPUs</button>
+        <button class="qopt" onclick="ans(this,'b','c')">B) The operating systems are incompatible</button>
+        <button class="qopt" onclick="ans(this,'c','c')">C) No space for cooling; battery would drain in minutes</button>
+        <button class="qopt" onclick="ans(this,'d','c')">D) Smartphone screens are too small</button>
+      </div>
+      <div class="qfb" id="f3"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="qbox" data-c="b">
+      <div class="qtext">4. Which of the following affects the performance of the CPU?</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','b')">A) Amount of RAM</button>
+        <button class="qopt" onclick="ans(this,'b','b')">B) Number of cores</button>
+        <button class="qopt" onclick="ans(this,'c','b')">C) Storage capacity</button>
+        <button class="qopt" onclick="ans(this,'d','b')">D) Network speed</button>
+      </div>
+      <div class="qfb" id="f4"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="qbox" data-c="d">
+      <div class="qtext">5. A slow GPU will NOT affect performance on which task?</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','d')">A) Playing high-end games</button>
+        <button class="qopt" onclick="ans(this,'b','d')">B) Editing 4K videos</button>
+        <button class="qopt" onclick="ans(this,'c','d')">C) 3D rendering</button>
+        <button class="qopt" onclick="ans(this,'d','d')">D) Browsing the web and creating documents</button>
+      </div>
+      <div class="qfb" id="f5"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="qbox" data-c="b">
+      <div class="qtext">6. What happens when RAM capacity is too small?</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','b')">A) The computer will not boot</button>
+        <button class="qopt" onclick="ans(this,'b','b')">B) The computer slows down; apps may auto-close to free memory</button>
+        <button class="qopt" onclick="ans(this,'c','b')">C) The CPU overheats</button>
+        <button class="qopt" onclick="ans(this,'d','b')">D) Storage speed decreases</button>
+      </div>
+      <div class="qfb" id="f6"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="qbox" data-c="c">
+      <div class="qtext">7. Disk cache is located on the _____.</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','c')">A) RAM</button>
+        <button class="qopt" onclick="ans(this,'b','c')">B) CPU</button>
+        <button class="qopt" onclick="ans(this,'c','c')">C) Hard disk drive</button>
+        <button class="qopt" onclick="ans(this,'d','c')">D) Motherboard</button>
+      </div>
+      <div class="qfb" id="f7"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="qbox" data-c="c">
+      <div class="qtext">8. Two of the most important requirements for a GAMER are:</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','c')">A) Mobility and storage capacity</button>
+        <button class="qopt" onclick="ans(this,'b','c')">B) CPU speed and RAM capacity</button>
+        <button class="qopt" onclick="ans(this,'c','c')">C) CPU speed and GPU processing power</button>
+        <button class="qopt" onclick="ans(this,'d','c')">D) Battery life and screen resolution</button>
+      </div>
+      <div class="qfb" id="f8"></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="qbox" data-c="c">
+      <div class="qtext">9. Which device would be BEST for a small office user?</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','c')">A) Smartphone</button>
+        <button class="qopt" onclick="ans(this,'b','c')">B) Desktop PC</button>
+        <button class="qopt" onclick="ans(this,'c','c')">C) Laptop computer (Ultrabook or mid-range notebook)</button>
+        <button class="qopt" onclick="ans(this,'d','c')">D) High-end gaming workstation</button>
+      </div>
+      <div class="qfb" id="f9"></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="qbox" data-c="a">
+      <div class="qtext">10. What connects the CPU with memory, input/output devices and storage?</div>
+      <div class="qopts">
+        <button class="qopt" onclick="ans(this,'a','a')">A) Bus system</button>
+        <button class="qopt" onclick="ans(this,'b','a')">B) GPU</button>
+        <button class="qopt" onclick="ans(this,'c','a')">C) Network card</button>
+        <button class="qopt" onclick="ans(this,'d','a')">D) Power supply</button>
+      </div>
+      <div class="qfb" id="f10"></div>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-out" onclick="resetQuiz()">🔄 Reset Quiz</button>
+      <button class="btn btn-electric" onclick="go('summary')">View Summary 📋</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SUMMARY                                     -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="sec-summary">
+  <div class="wrap">
+    <div class="sh">📋 Chapter 3 Summary</div>
+    <div class="ss">All the essentials — one screen, no flipping through the textbook!</div>
+
+    <div class="sum-grid">
+      <div class="sum-item">
+        <div class="sum-label">Unit 3.1</div>
+        <div class="sum-title">📱 Mobile Technologies</div>
+        <p><strong>Advantages:</strong> Size, weight, portability, location-based computing<br><strong>Constraints:</strong> Battery life, heat/power consumption, small screen, integrated components</p>
+      </div>
+      <div class="sum-item">
+        <div class="sum-label">Unit 3.2</div>
+        <div class="sum-title">⚡ Performance Factors</div>
+        <p>CPU (speed, cores) · GPU (type, speed) · RAM capacity · Cache (CPU, disk, web) · Storage speed · Network speed (NIC)</p>
+      </div>
+      <div class="sum-item">
+        <div class="sum-label">Unit 3.3</div>
+        <div class="sum-title">👤 User Requirements</div>
+        <p>Home (balance) · Office (mobility, battery) · Gamer (GPU, CPU) · Power User (everything high-end, dual monitors)</p>
+      </div>
+    </div>
+
+    <div class="card electric" style="margin-bottom:22px;">
+      <div class="ct"><span class="ci">🔑</span>Must-Know Definitions</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;font-size:.88rem;">
+        <div><strong style="color:var(--electric);">Mobile Technologies</strong> — Small, portable devices: smartphones, laptops, tablets</div>
+        <div><strong style="color:var(--cyan);">CPU (Central Processing Unit)</strong> — The "brain"; completes general processing tasks</div>
+        <div><strong style="color:var(--volt);">GPU (Graphics Processing Unit)</strong> — Completes graphics processing; critical for gaming/video</div>
+        <div><strong style="color:var(--orange);">RAM (Random Access Memory)</strong> — Temporary high-speed storage; more RAM = better multitasking</div>
+        <div><strong style="color:var(--crimson);">Cache Memory</strong> — Very fast temporary storage (CPU cache, disk cache, web cache)</div>
+        <div><strong style="color:var(--purple);">HDD vs SSD</strong> — HDD = slow, cheap, spinning disk. SSD = fast, expensive, no moving parts</div>
+        <div><strong style="color:var(--electric);">NIC (Network Interface Card)</strong> — Connects computer to network/internet; measured in Mbps</div>
+        <div><strong style="color:var(--cyan);">Multiprocessing</strong> — CPU's ability to handle tasks from multiple apps simultaneously</div>
+        <div><strong style="color:var(--volt);">Location-Based Computing</strong> — Software that changes based on user's GPS location (Uber, weather apps)</div>
+        <div><strong style="color:var(--orange);">Bus System</strong> — The electrical "highway" connecting CPU, memory, I/O devices and storage</div>
+      </div>
+    </div>
+
+    <div class="card crimson" style="margin-bottom:22px;">
+      <div class="ct"><span class="ci">🆚</span>Key Comparisons</div>
+      <div style="overflow-x:auto;margin-top:10px;">
+        <table class="tbl">
+          <thead><tr><th>Concept A</th><th>vs</th><th>Concept B</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Smartphone</strong> — portable, location-based, limited power</td><td>⚔️</td><td><strong>Desktop</strong> — powerful, best for serious work, needs desk</td></tr>
+            <tr><td><strong>CPU</strong> — general processing, affects overall speed</td><td>⚔️</td><td><strong>GPU</strong> — graphics only, critical for games/video</td></tr>
+            <tr><td><strong>HDD</strong> — slow, mechanical, cheap (measured in RPM)</td><td>⚔️</td><td><strong>SSD</strong> — fast, solid-state, expensive</td></tr>
+            <tr><td><strong>Home User</strong> — balanced, entry/mid-range</td><td>⚔️</td><td><strong>Power User</strong> — high-end everything, 2+ monitors</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:36px;">
+      <div style="font-family:'Orbitron',sans-serif;font-size:1.6rem;margin-bottom:12px;color:var(--electric);">🎉 Chapter 3 Complete!</div>
+      <p style="color:var(--muted);margin-bottom:24px;">You now understand mobile vs desktop trade-offs, the 6 performance factors,<br>and how to spec computers for any user type. Time to ace that test!</p>
+      <button class="btn btn-electric" onclick="go('quiz')">Retry Quiz 🎯</button>
+      <button class="btn btn-out" onclick="go('intro')" style="margin-left:12px;">Start Over 🏠</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── NAV ──
+const secs=['intro','mobile','performance','users','quiz','summary'];
+const progs=[16,33,50,66,83,100];
+
+function go(id){
+  secs.forEach((s,i)=>{
+    document.getElementById('sec-'+s).classList.toggle('on',s===id);
+    document.querySelectorAll('.ntab')[i].classList.toggle('on',s===id);
+  });
+  document.getElementById('pf').style.width=progs[secs.indexOf(id)]+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── PERFORMANCE FACTOR EXPAND ──
+function togglePF(card){
+  const isOpen=card.classList.contains('open');
+  document.querySelectorAll('.pf-card').forEach(c=>c.classList.remove('open'));
+  if(!isOpen)card.classList.add('open');
+}
+
+// ── USER DETAIL ──
+const userDetails={
+  home:`<div class="card volt">
+    <div class="ct"><span class="ci">🏠</span>Home User — Balanced Computing</div>
+    <p style="margin-bottom:12px;"><strong>Uses computer for:</strong> Browsing internet, social networks, email, word processing, watching videos, listening to music.</p>
+    <p style="margin-bottom:12px;"><strong>Requirements:</strong> Doesn't need top-of-the-line components, but wants a good balance of cost and capability.</p>
+    <p><strong>Recommended Setup:</strong> Desktop with entry-level or mid-range CPU (Intel i3, AMD Ryzen 3), entry-level GPU (optional, for light gaming), 8 GB RAM, 1 TB HDD (7200 RPM), 23" FHD monitor, speakers, printer.</p>
+  </div>`,
+  office:`<div class="card cyan">
+    <div class="ct"><span class="ci">💼</span>Small Office User — Mobility Matters</div>
+    <p style="margin-bottom:12px;"><strong>Uses computer for:</strong> Online research, emails, business communication, word processing, spreadsheets, note-taking.</p>
+    <p style="margin-bottom:12px;"><strong>Key Requirements:</strong> <strong>Mobility</strong> (take to meetings/home), <strong>Battery Life</strong> (work without power), <strong>Screen Resolution</strong> (view more info at once), <strong>Speed</strong> (never slow down productivity).</p>
+    <p><strong>Recommended Setup:</strong> Ultrabook or mid-range notebook with Intel i5, 8 GB RAM, 500 GB storage, 14-15" built-in screen, external monitor + wireless keyboard/mouse for desk use.</p>
+  </div>`,
+  gamer:`<div class="card orange">
+    <div class="ct"><span class="ci">🎮</span>Gamer — GPU is King</div>
+    <p style="margin-bottom:12px;"><strong>Uses computer for:</strong> Playing high-end games with ultra-quality graphics, 4K resolution, fast frame rates. May also stream gameplay.</p>
+    <p style="margin-bottom:12px;"><strong>Key Requirements:</strong> <strong>GPU Processing Power</strong> (most important!), <strong>CPU Speed</strong> (to keep up with GPU), good cooling, high refresh rate monitor.</p>
+    <p><strong>Recommended Setup:</strong> Desktop with Intel i5/AMD Ryzen 5, high-end GPU (GeForce x60/x70 series or Radeon x70/x80), 8 GB RAM (2666 MHz), 256 GB SSD + 2 TB HDD, 23" FHD monitor, gaming mouse, gaming headset, speakers.</p>
+  </div>`,
+  power:`<div class="card crimson">
+    <div class="ct"><span class="ci">⚡</span>Power User — No Compromises</div>
+    <p style="margin-bottom:12px;"><strong>Uses computer for:</strong> Video editing, 3D rendering, programming, running multiple resource-intensive apps at once, virtual machines.</p>
+    <p style="margin-bottom:12px;"><strong>Key Requirements:</strong> <strong>Maximum processing power</strong>, <strong>lots of storage</strong>, <strong>lots of memory</strong>, <strong>multi-monitor support</strong>.</p>
+    <p><strong>Recommended Setup:</strong> Desktop with Intel i7/AMD Ryzen 7, high-end GPU (GeForce x60/x70 or Radeon x70/x80), 16 GB RAM (2666 MHz), 256 GB SSD + 4 TB HDD, 2× 23" FHD monitors, speakers. Everything is high-end!</p>
+  </div>`
+};
+
+function showUser(card,type){
+  const det=document.getElementById('userDetail');
+  det.innerHTML=userDetails[type];
+  det.style.display='block';
+  det.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── QUIZ ──
+const fbs={
+  1:{r:'✅ Correct! Smartphones have built-in GPS and are designed for location-based computing — Uber, weather apps, Pokémon GO!',w:'❌ Incorrect. Smartphones are BEST for location-based tech due to built-in GPS and mobile connectivity.'},
+  2:{r:'✅ Correct! More power = more heat. This is why smartphones can\'t use desktop-level CPUs — they\'d overheat!',w:'❌ Incorrect. More power consumption = more heat generated. This is a fundamental constraint of mobile devices.'},
+  3:{r:'✅ Correct! Smartphones lack cooling fans. Desktop-level power would overheat the device and drain the battery in minutes.',w:'❌ Incorrect. Smartphones can\'t run desktop programs because they have no space for cooling, and the battery would drain instantly.'},
+  4:{r:'✅ Correct! Number of cores directly affects CPU performance and multiprocessing ability.',w:'❌ Incorrect. The number of cores is a direct CPU performance factor. More cores = better multitasking.'},
+  5:{r:'✅ Correct! A slow GPU won\'t affect browsing or document creation — only graphic-intensive tasks like gaming and video editing.',w:'❌ Incorrect. GPUs only matter for graphic-intensive tasks. Browsing and documents don\'t need GPU power.'},
+  6:{r:'✅ Correct! When RAM is full, the computer slows down constantly swapping data, and may auto-close apps to free memory.',w:'❌ Incorrect. Too little RAM causes slowdowns and the computer may auto-close apps to free memory.'},
+  7:{r:'✅ Correct! Disk cache is a small amount of RAM built INTO the hard disk drive itself.',w:'❌ Incorrect. Disk cache is located on the hard disk drive (HDD), not RAM or CPU.'},
+  8:{r:'✅ Correct! Gamers need fast CPU speed AND powerful GPU processing — these are the two most critical factors.',w:'❌ Incorrect. Gamers prioritize CPU speed and GPU processing power above all else.'},
+  9:{r:'✅ Correct! Office users need mobility, battery life and portability — a laptop/notebook is ideal.',w:'❌ Incorrect. Small office users prioritize mobility and battery life — laptops/notebooks are best.'},
+  10:{r:'✅ Correct! The bus system is the electrical "highway" connecting all components.',w:'❌ Incorrect. The bus system connects the CPU with memory, I/O devices and storage.'}
+};
+
+let answered={},score=0;
+
+function ans(btn,chosen,correct){
+  const qDiv=btn.closest('.qbox');
+  const idx=Array.from(document.querySelectorAll('.qbox')).indexOf(qDiv)+1;
+  if(answered[idx])return;
+  answered[idx]=true;
+  const opts=qDiv.querySelectorAll('.qopt');
+  opts.forEach(o=>o.disabled=true);
+  const right=chosen===correct;
+  btn.classList.add(right?'right':'wrong');
+  if(!right) opts.forEach(o=>{if(o.getAttribute('onclick').includes(`'${correct}'`))o.classList.add('right');});
+  const fb=document.getElementById('f'+idx);
+  fb.textContent=fbs[idx][right?'r':'w'];
+  fb.className='qfb show '+(right?'right':'wrong');
+  if(right)score++;
+  if(Object.keys(answered).length===10){
+    const ban=document.getElementById('scoreBanner');
+    ban.classList.add('show');
+    document.getElementById('scoreNum').textContent=score+'/10';
+    const pct=Math.round(score/10*100);
+    document.getElementById('scoreMsg').textContent=pct>=80?'⚡ Outstanding! You\'ve mastered Hardware!':pct>=60?'👍 Good work! Review weak areas and try again.':'📖 Keep going! Revisit the units and retry.';
+    ban.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+
+function resetQuiz(){
+  answered={};score=0;
+  document.querySelectorAll('.qopt').forEach(o=>{o.classList.remove('right','wrong');o.disabled=false;});
+  document.querySelectorAll('.qfb').forEach(f=>{f.className='qfb';f.textContent='';});
+  document.getElementById('scoreBanner').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
